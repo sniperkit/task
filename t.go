@@ -53,6 +53,13 @@ func (t *T) Start() (ok bool) {
 	return !t.canceled
 }
 
+func (t *T) Do(f func()) {
+	if t.Start() {
+		f()
+		t.Done()
+	}
+}
+
 // IsAborting returns true if the task has been requested to abort.
 // Task workers are supposed to stop working on the task once got true from this method.
 func (t *T) IsAborting() bool {
@@ -73,6 +80,7 @@ func (t *T) Done() {
 	if t.canceled {
 		panic("canceled task must not be Done()")
 	}
+	t.done = true
 	t.doneC <- Notification{}
 }
 
